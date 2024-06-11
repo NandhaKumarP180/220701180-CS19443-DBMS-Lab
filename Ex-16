@@ -1,6 +1,19 @@
 PROGRAM 1
 Write a PL/SQL block to calculate the incentive of an employee whose ID is 110.
 
+CREATE TABLE employees (
+    employee_id NUMBER(6) PRIMARY KEY,
+    salary      NUMBER(8,2)
+);
+
+
+INSERT INTO employees (employee_id, salary) VALUES (110, 50000);
+INSERT INTO employees (employee_id, salary) VALUES (111, 55000);
+INSERT INTO employees (employee_id, salary) VALUES (112, 60000);
+
+
+COMMIT;
+-----------------------------PLSQL-------------------------------
 DECLARE
   incentive   NUMBER(8,2);
 BEGIN
@@ -16,28 +29,50 @@ PROGRAM 2
 Write a PL/SQL block to show an invalid case-insensitive reference to a quoted and
 without quoted user-defined identifier.
 
+
+
+-- Create the sample table
+CREATE TABLE welcome_messages (
+    message_id NUMBER PRIMARY KEY,
+    message VARCHAR2(50)
+);
+
+-- Insert sample data into the welcome_messages table
+INSERT INTO welcome_messages (message_id, message) VALUES (1, 'welcome');
+
+-- PL/SQL block with invalid case-insensitive reference to quoted identifier
 DECLARE
-  "WELCOME" varchar2(10) := 'welcome'; -- identifier with quotation 
+  "WELCOME" VARCHAR2(10) := 'welcome'; -- identifier with quotation
 BEGIN
-  DBMS_Output.Put_Line("Welcome"); --reference to the identifier with quotation and different case
+  DBMS_OUTPUT.PUT_LINE(Welcome); -- invalid case-insensitive reference to the quoted identifier
 END;
 /
 
-DECLARE
-  WELCOME varchar2(10) := 'welcome'; -- identifier without quotation
-BEGIN
-  DBMS_Output.Put_Line("Welcome"); --reference to the identifier with quotation and different case
-END;
-/
 
 
 PROGRAM 3
 Write a PL/SQL block to adjust the salary of the employee whose ID 122.
 Sample table: employees
 
+
+-- Create the employees table
+CREATE TABLE employees (
+    employee_id NUMBER PRIMARY KEY,
+    salary NUMBER(8,2)
+);
+
+-- Insert sample data into the employees table
+INSERT INTO employees (employee_id, salary) VALUES (121, 50000);
+INSERT INTO employees (employee_id, salary) VALUES (122, 60000);
+INSERT INTO employees (employee_id, salary) VALUES (123, 55000);
+
+-- Commit the transaction to save changes
+COMMIT;
+
+-- PL/SQL block to adjust the salary of employee with ID 122
 DECLARE
   salary_of_emp  NUMBER(8,2);
- 
+
   PROCEDURE approx_salary (
     emp        NUMBER, 
     empsal IN OUT NUMBER,
@@ -48,20 +83,27 @@ DECLARE
   END;
  
 BEGIN
+  -- Select the current salary of the employee with ID 122
   SELECT salary INTO salary_of_emp
   FROM employees
   WHERE employee_id = 122;
- 
-  DBMS_OUTPUT.PUT_LINE
-   ('Before invoking procedure, salary_of_emp: ' || salary_of_emp);
- 
-  approx_salary (100, salary_of_emp, 1000);
- 
-  DBMS_OUTPUT.PUT_LINE
-   ('After invoking procedure, salary_of_emp: ' || salary_of_emp);
+
+  DBMS_OUTPUT.PUT_LINE('Before invoking procedure, salary_of_emp: ' || salary_of_emp);
+
+  -- Adjust the salary by invoking the procedure
+  approx_salary(122, salary_of_emp, 1000);
+
+  DBMS_OUTPUT.PUT_LINE('After invoking procedure, salary_of_emp: ' || salary_of_emp);
+
+  -- Update the salary in the employees table
+  UPDATE employees
+  SET salary = salary_of_emp
+  WHERE employee_id = 122;
+
+  -- Commit the transaction to save changes
+  COMMIT;
 END;
 /
-
 
 PROGRAM 4
 Write a PL/SQL block to create a procedure using the &quot;IS [NOT] NULL Operator&quot;
@@ -143,20 +185,40 @@ Write a PL/SQL program to arrange the number of two variable in such a way that
 the small number will store in num_small variable and large number will store in
 num_large variable.
 
+
+CREATE TABLE numbers (
+    id NUMBER PRIMARY KEY,
+    num_small NUMBER,
+    num_large NUMBER
+);
+
+INSERT INTO numbers (id, num_small, num_large) VALUES (1, 8, 5);
+
+COMMIT;
+
 DECLARE
-num_small NUMBER := 8;
-num_large NUMBER := 5;
-num_temp NUMBER;
+  num_small NUMBER;
+  num_large NUMBER;
+  num_temp NUMBER;
 BEGIN
+  SELECT num_small, num_large INTO num_small, num_large
+  FROM numbers
+  WHERE id = 1;
 
-IF num_small > num_large THEN
-num_temp := num_small;
-num_small := num_large;
-num_large := num_temp;
-END IF;
+  IF num_small > num_large THEN
+    num_temp := num_small;
+    num_small := num_large;
+    num_large := num_temp;
+  END IF;
 
-DBMS_OUTPUT.PUT_LINE ('num_small = '||num_small);
-DBMS_OUTPUT.PUT_LINE ('num_large = '||num_large);
+  DBMS_OUTPUT.PUT_LINE ('num_small = ' || num_small);
+  DBMS_OUTPUT.PUT_LINE ('num_large = ' || num_large);
+
+  UPDATE numbers
+  SET num_small = num_small, num_large = num_large
+  WHERE id = 1;
+
+  COMMIT;
 END;
 /
 
